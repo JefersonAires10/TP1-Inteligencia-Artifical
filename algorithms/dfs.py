@@ -4,12 +4,13 @@ from models.Node import Estado
 class BuscaEmProfundidade(Busca):
     def __init__(self, estado_inicial, objetivo, calcular_custo):
         super().__init__(estado_inicial, objetivo, calcular_custo)
+        self.limite_profundidade = 10  # Defina um limite de profundidade para evitar loops infinitos
 
     def buscar(self):
-        pilha = [self.estado_inicial]
+        pilha = [(self.estado_inicial, 0)]  # Usamos tuplas (estado, tempo)
 
         while pilha:
-            estado_atual = pilha.pop()
+            estado_atual, tempo = pilha.pop()
             profundidade = estado_atual.profundidade
 
             # Verificando se atingiu o objetivo
@@ -22,28 +23,32 @@ class BuscaEmProfundidade(Busca):
 
             self.visitados.add(estado_atual)
 
-            # Função para calcular o custo
-            def calcula_custo_acao(estado_atual, acao):
-                custo = self.calcular_custo(estado_atual, acao)
-                if custo is None:
-                    print(f"Erro: Custo retornado como None para a ação {acao}")
-                    return 0  # Retorna um valor padrão, como 0
-                return custo
+            # Limite de profundidade atingido
+            if profundidade >= self.limite_profundidade:
+                continue
 
             # Criando os vizinhos
-            vizinhos = [
-                Estado(estado_atual.x - 1, estado_atual.y, profundidade + 1, estado_atual.cost + calcula_custo_acao(estado_atual, 'f1')),
-                Estado(estado_atual.x + 1, estado_atual.y, profundidade + 1, estado_atual.cost + calcula_custo_acao(estado_atual, 'f2')),
-                Estado(estado_atual.x, estado_atual.y - 1, profundidade + 1, estado_atual.cost + calcula_custo_acao(estado_atual, 'f3')),
-                Estado(estado_atual.x, estado_atual.y + 1, profundidade + 1, estado_atual.cost + calcula_custo_acao(estado_atual, 'f4')),
-            ]
-
-            # Adicionando os vizinhos à pilha e atribuindo o caminho
-            for vizinho in vizinhos:
-                if vizinho not in self.visitados and vizinho.x >= 0 and vizinho.y >= 0:
+            acoes = ['f1', 'f2', 'f3', 'f4']
+            for acao in acoes:
+                if acao == 'f1':
+                    novo_estado = Estado(estado_atual.x - 1, estado_atual.y, profundidade + 1)
+                elif acao == 'f2':
+                    novo_estado = Estado(estado_atual.x + 1, estado_atual.y, profundidade + 1)
+                elif acao == 'f3':
+                    novo_estado = Estado(estado_atual.x, estado_atual.y - 1, profundidade + 1)
+                elif acao == 'f4':
+                    novo_estado = Estado(estado_atual.x, estado_atual.y + 1, profundidade + 1)
+                
+                custo_incremental = self.calcular_custo(estado_atual, tempo, acao)
+                novo_estado.cost = estado_atual.cost + custo_incremental
+                
+                # Adicionando o vizinho à pilha e atribuindo o caminho
+                if novo_estado.x >= 0 and novo_estado.y >= 0:
                     self.nos_gerados += 1
-                    pilha.append(vizinho)
-                    self.caminho[vizinho] = estado_atual
-
+                    pilha.append((novo_estado, tempo+1))
+                    
+                    # Verifica se o estado já está no caminho ou se o novo custo é menor
+                    if novo_estado not in self.caminho or (self.caminho[novo_estado] is not None and novo_estado.cost < self.caminho[novo_estado].cost):
+                        self.caminho[novo_estado] = estado_atual
         # Caso o objetivo não seja encontrado
         return self.construir_saida(None, erro=True)
