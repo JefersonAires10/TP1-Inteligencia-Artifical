@@ -1,44 +1,37 @@
 from collections import deque
-from models.Busca import Busca
-from models.Node import Estado
-class BuscaEmLargura(Busca):
-    def __init__(self, estado_inicial, objetivo, calcular_custo):
-        super().__init__(estado_inicial, objetivo, calcular_custo)
+import math
+from models.Node import Node, reconstruir_caminho
 
-    def buscar(self):
-        fila = deque([self.estado_inicial])
+def busca_em_largura(x1, y1, x2, y2, acao_custo):
+    fila = deque([Node(x1, y1, 0, 0, acao_custo = acao_custo)])
+    visitados = set()
+    nos_gerados = 0
 
-        while fila:
-            estado_atual = fila.popleft()
-            profundidade = estado_atual.profundidade
-            if estado_atual == self.objetivo:
-                return self.construir_saida(profundidade)
+    while fila:
+        no_atual = fila.popleft()
+        estado_atual = (no_atual.x, no_atual.y)
 
-            if estado_atual in self.visitados:
-                continue
+        if estado_atual == (x2, y2):
+            return {
+                "estado_inicial": (x1, y1),
+                "objetivo": (x2, y2),
+                "caminho": reconstruir_caminho(no_atual),
+                "custo": no_atual.custo,
+                "nos_gerados": nos_gerados,
+                "nos_visitados": len(visitados),
+            }
 
-            self.visitados.add(estado_atual)
+        if estado_atual not in visitados:
+            visitados.add(estado_atual)
+            vizinhos = no_atual.gerar_vizinhos(visitados)
+            nos_gerados += len(vizinhos)
+            fila.extend(vizinhos)
 
-            # Verificando se o custo calculado é válido
-            def calcula_custo_acao(estado_atual, profundidade, acao):
-                custo = self.calcular_custo(estado_atual, profundidade, acao)
-                if custo is None:
-                    # Se retornar None, substitua por um valor padrão (ex: 0)
-                    print(f"Erro: Custo retornado como None para a ação {acao}")
-                    return 0  # ou algum outro valor adequado
-                return custo
-
-            vizinhos = [
-                Estado(estado_atual.x - 1, estado_atual.y, profundidade + 1, estado_atual.cost + calcula_custo_acao(estado_atual, profundidade, 'f1')),
-                Estado(estado_atual.x + 1, estado_atual.y, profundidade + 1, estado_atual.cost + calcula_custo_acao(estado_atual, profundidade, 'f2')),
-                Estado(estado_atual.x, estado_atual.y - 1, profundidade + 1, estado_atual.cost + calcula_custo_acao(estado_atual, profundidade, 'f3')),
-                Estado(estado_atual.x, estado_atual.y + 1, profundidade + 1, estado_atual.cost + calcula_custo_acao(estado_atual, profundidade, 'f4')),
-            ]
-
-            for vizinho in vizinhos:
-                if vizinho not in self.visitados and vizinho.x >= 0 and vizinho.y >= 0:
-                    self.nos_gerados += 1
-                    fila.append(vizinho)
-                    self.caminho[vizinho] = estado_atual
-
-        return self.construir_saida(None, erro=True)
+    return {
+        "estado_inicial": (x1, y1),
+        "objetivo": (x2, y2),
+        "caminho": None,
+        "custo": math.inf,
+        "nos_gerados": nos_gerados,
+        "nos_visitados": len(visitados),
+    }

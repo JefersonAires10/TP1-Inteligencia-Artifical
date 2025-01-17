@@ -1,54 +1,44 @@
-from models.Busca import Busca
-from models.Node import Estado
+from collections import deque
+import math
+from models.Node import Node, reconstruir_caminho
 
-class BuscaEmProfundidade(Busca):
-    def __init__(self, estado_inicial, objetivo, calcular_custo):
-        super().__init__(estado_inicial, objetivo, calcular_custo)
-        self.limite_profundidade = 10  # Defina um limite de profundidade para evitar loops infinitos
+def busca_em_profundidade(x1, y1, x2, y2, acao_custo):
+    pilha = [Node(x1, y1, 0, 0, acao_custo=acao_custo)]  # Pilha inicial com o nó raiz
+    visitados = set()  # Conjunto para armazenar estados visitados
+    nos_gerados = 0
 
-    def buscar(self):
-        pilha = [(self.estado_inicial, 0)]  # Usamos tuplas (estado, tempo)
+    while pilha:
+        no_atual = pilha.pop()  # Remove o nó do topo da pilha
+        estado_atual = (no_atual.x, no_atual.y)
 
-        while pilha:
-            estado_atual, tempo = pilha.pop()
-            profundidade = estado_atual.profundidade
+        # Verifica se o objetivo foi alcançado
+        if estado_atual == (x2, y2):
+            return {
+                "estado_inicial": (x1, y1),
+                "objetivo": (x2, y2),
+                "caminho": reconstruir_caminho(no_atual),
+                "custo": no_atual.custo,
+                "nos_gerados": nos_gerados,
+                "nos_visitados": len(visitados),
+            }
 
-            # Verificando se atingiu o objetivo
-            if estado_atual == self.objetivo:
-                return self.construir_saida(profundidade)
+        # Adiciona o estado atual aos visitados
+        if estado_atual not in visitados:
+            visitados.add(estado_atual)
 
-            # Ignora estados já visitados
-            if estado_atual in self.visitados:
-                continue
+            # Gera vizinhos que ainda não foram visitados
+            vizinhos = no_atual.gerar_vizinhos(visitados)
+            nos_gerados += len(vizinhos)
 
-            self.visitados.add(estado_atual)
+            # Adiciona os vizinhos à pilha
+            pilha.extend(vizinhos)
 
-            # Limite de profundidade atingido
-            if profundidade >= self.limite_profundidade:
-                continue
-
-            # Criando os vizinhos
-            acoes = ['f1', 'f2', 'f3', 'f4']
-            for acao in acoes:
-                if acao == 'f1':
-                    novo_estado = Estado(estado_atual.x - 1, estado_atual.y, profundidade + 1)
-                elif acao == 'f2':
-                    novo_estado = Estado(estado_atual.x + 1, estado_atual.y, profundidade + 1)
-                elif acao == 'f3':
-                    novo_estado = Estado(estado_atual.x, estado_atual.y - 1, profundidade + 1)
-                elif acao == 'f4':
-                    novo_estado = Estado(estado_atual.x, estado_atual.y + 1, profundidade + 1)
-                
-                custo_incremental = self.calcular_custo(estado_atual, tempo, acao)
-                novo_estado.cost = estado_atual.cost + custo_incremental
-                
-                # Adicionando o vizinho à pilha e atribuindo o caminho
-                if novo_estado.x >= 0 and novo_estado.y >= 0:
-                    self.nos_gerados += 1
-                    pilha.append((novo_estado, tempo+1))
-                    
-                    # Verifica se o estado já está no caminho ou se o novo custo é menor
-                    if novo_estado not in self.caminho or (self.caminho[novo_estado] is not None and novo_estado.cost < self.caminho[novo_estado].cost):
-                        self.caminho[novo_estado] = estado_atual
-        # Caso o objetivo não seja encontrado
-        return self.construir_saida(None, erro=True)
+    # Caso não encontre o objetivo
+    return {
+        "estado_inicial": (x1, y1),
+        "objetivo": (x2, y2),
+        "caminho": None,
+        "custo": math.inf,
+        "nos_gerados": nos_gerados,
+        "nos_visitados": len(visitados),
+    }

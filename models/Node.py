@@ -1,15 +1,30 @@
-class Estado:
-    def __init__(self, x, y, profundidade=0, cost=0):
+class Node:
+    def __init__(self, x, y, custo, profundidade, pai=None, acao_custo=None):
         self.x = x
         self.y = y
+        self.custo = custo
         self.profundidade = profundidade
-        self.cost = cost
+        self.pai = pai
+        self.acao_custo = acao_custo
 
-    def __eq__(self, other):
-        return self.x == other.x and self.y == other.y
+    def __lt__(self, other):
+        return self.custo < other.custo
 
-    def __hash__(self):
-        return hash((self.x, self.y))
+    def gerar_vizinhos(self, visitados):
+        x, y, profundidade = self.x, self.y, self.profundidade
+        vizinhos = []
+        estados_vizinhos = [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]
+        acoes = ["f1", "f2", "f3", "f4"]
 
-    def __repr__(self):
-        return f"({self.x}, {self.y}, {self.profundidade}, {self.cost})"
+        for i, (nx, ny) in enumerate(estados_vizinhos):
+            if nx >= 0 and ny >= 0 and (nx, ny) not in visitados:
+                custo_novo = self.custo + self.acao_custo(acoes[i], profundidade)
+                vizinhos.append(Node(nx, ny, custo_novo, profundidade + 1, self, self.acao_custo))
+        return vizinhos
+    
+def reconstruir_caminho(no):
+    caminho = []
+    while no:
+        caminho.append((no.x, no.y))
+        no = no.pai
+    return list(reversed(caminho))

@@ -1,141 +1,77 @@
-from collections import deque
-import heapq
+import random
 import math
+from algorithms.aEstrela import a_estrela
+from algorithms.dijkstra import dijkstra
+# from actionCost import c1 as c1, c2 as c2, c3 as c3, c4 as c4
 
-# Classe para representar um nó na árvore de busca
-class Node:
-    def __init__(self, x, y, custo, profundidade, pai=None):
-        self.x = x
-        self.y = y
-        self.custo = custo
-        self.profundidade = profundidade
-        self.pai = pai  # Para reconstruir o caminho
+from heuristic.h1 import heuristica_h1
+from heuristic.h2 import heuristica_h2
 
-    def __lt__(self, other):
-        return self.custo < other.custo
 
-# Função para reconstruir o caminho
-def reconstruir_caminho(no):
-    caminho = []
-    while no:
-        caminho.append((no.x, no.y))
-        no = no.pai
-    return list(reversed(caminho))
+def executar_experimentos(num_execucoes=50):
+    def c1(acao, _):
+        return 10
 
-# Função para gerar os vizinhos de um nó
-def gerar_vizinhos(no, acaoCusto):
-    x, y, profundidade = no.x, no.y, no.profundidade
-    vizinhos = [
-        Node(x - 1, y, no.custo + acaoCusto("f1", profundidade), profundidade + 1, no),  # Esquerda
-        Node(x + 1, y, no.custo + acaoCusto("f2", profundidade), profundidade + 1, no),  # Direita
-        Node(x, y - 1, no.custo + acaoCusto("f3", profundidade), profundidade + 1, no),  # Baixo
-        Node(x, y + 1, no.custo + acaoCusto("f4", profundidade), profundidade + 1, no),  # Cima
-    ]
-    return [vizinho for vizinho in vizinhos if vizinho.x >= 0 and vizinho.y >= 0]
+    def c2(acao, _):
+        return 10 if acao in {"f3", "f4"} else 15
 
-# Implementação dos algoritmos
-def busca_em_largura(x1, y1, x2, y2, acaoCusto):
-    fila = deque([Node(x1, y1, 0, 0)])
-    visitados = set()
-    nos_gerados = 0
+    def c3(acao, t):
+        return 10 if acao in {"f3", "f4"} else 10 + (abs(5 - t) % 6)
 
-    while fila:
-        no_atual = fila.popleft()
-        estado_atual = (no_atual.x, no_atual.y)
+    def c4(acao, t):
+        return 10 if acao in {"f3", "f4"} else 5 + (abs(10 - t) % 11)
 
-        if estado_atual == (x2, y2):
-            return {
-                "estado_inicial": (x1, y1),
-                "objetivo": (x2, y2),
-                "caminho": reconstruir_caminho(no_atual),
-                "custo": no_atual.custo,
-                "nos_gerados": nos_gerados,
-                "nos_visitados": len(visitados),
-            }
+    resultados = []
+    funcoes_custo = [c1, c2, c3, c4]
+    funcoes_heuristicas = [heuristica_h1, heuristica_h2]
+    
+    for _ in range(num_execucoes):
+        # Gera coordenadas aleatórias
+        x1 = random.randint(0, 9)
+        y1 = random.randint(0, 9)
+        x2 = random.randint(0, 9)
+        y2 = random.randint(0, 9)
+        
+        # Executa Busca de Custo Uniforme
+        for acao_custo in funcoes_custo:
+             resultado = dijkstra(x1, y1, x2, y2, acao_custo)
+             resultados.append({
+                 "algoritmo": "Custo Uniforme",
+                 "funcao_custo": acao_custo.__name__,
+                 "estado_inicial": (x1, y1),
+                 "objetivo": (x2, y2),
+                 "caminho": resultado["caminho"],
+                 "custo": resultado["custo"],
+                 "nos_gerados": resultado["nos_gerados"],
+                 "nos_visitados": resultado["nos_visitados"],
+             })
+        
+        # Executa Busca A*
+        for acao_custo in funcoes_custo:
+            for heuristica in funcoes_heuristicas:
+                resultado = a_estrela(x1, y1, x2, y2, acao_custo, heuristica)
+                resultados.append({
+                    "algoritmo": "A*",
+                    "funcao_custo": acao_custo.__name__,
+                    "heuristica": heuristica.__name__,
+                    "estado_inicial": (x1, y1),
+                    "objetivo": (x2, y2),
+                    "caminho": resultado["caminho"],
+                    "custo": resultado["custo"],
+                    "nos_gerados": resultado["nos_gerados"],
+                    "nos_visitados": resultado["nos_visitados"],
+                })
+    return resultados
 
-        if estado_atual not in visitados:
-            visitados.add(estado_atual)
-            vizinhos = gerar_vizinhos(no_atual, acaoCusto)
-            nos_gerados += len(vizinhos)
-            fila.extend(vizinhos)
 
-    return {
-        "estado_inicial": (x1, y1),
-        "objetivo": (x2, y2),
-        "caminho": None,
-        "custo": math.inf,
-        "nos_gerados": nos_gerados,
-        "nos_visitados": len(visitados),
-    }
+def salvar_resultados(resultados, nome_arquivo="resultados_experimento.txt"):
+    with open(nome_arquivo, "w") as arquivo:
+        for resultado in resultados:
+            linha = ", ".join(f"{chave}: {valor}" for chave, valor in resultado.items())
+            arquivo.write(linha + "\n")
+    print(f"Resultados salvos em {nome_arquivo}")
 
-# Outras implementações de algoritmos podem ser adicionadas aqui, como:
-# busca_em_profundidade, busca_custo_uniforme, A*, etc.
 
-def busca_em_profundidade(x1, y1, x2, y2, acaoCusto):
-    pilha = [Node(x1, y1, 0, 0)]
-    visitados = set()
-    nos_gerados = 0
-
-    while pilha:
-        no_atual = pilha.pop()
-        estado_atual = (no_atual.x, no_atual.y)
-
-        if estado_atual == (x2, y2):
-            return {
-                "estado_inicial": (x1, y1),
-                "objetivo": (x2, y2),
-                "caminho": reconstruir_caminho(no_atual),
-                "custo": no_atual.custo,
-                "nos_gerados": nos_gerados,
-                "nos_visitados": len(visitados),
-            }
-
-        if estado_atual not in visitados:
-            visitados.add(estado_atual)
-            vizinhos = gerar_vizinhos(no_atual, acaoCusto)
-            nos_gerados += len(vizinhos)
-            pilha.extend(vizinhos)
-
-    return {
-        "estado_inicial": (x1, y1),
-        "objetivo": (x2, y2),
-        "caminho": None,
-        "custo": math.inf,
-        "nos_gerados": nos_gerados,
-        "nos_visitados": len(visitados),
-    }
-
-# Exemplos de funções de custo
-def custo_c1(acao, _):
-    return 10
-
-def custo_c2(acao, _):
-    return 10 if acao in {"f3", "f4"} else 15
-
-def custo_c3(acao, t):
-    return 10 if acao in {"f3", "f4"} else 10 + (abs(5 - t) % 6)
-
-def custo_c4(acao, t):
-    return 10 if acao in {"f3", "f4"} else 5 + (abs(10 - t) % 11)
-
-# Execução de experimentos
-def executar_experimento(algoritmo, x1, y1, x2, y2, acaoCusto):
-    resultado = algoritmo(x1, y1, x2, y2, acaoCusto)
-    print("Estado Inicial:", resultado["estado_inicial"])
-    print("Objetivo:", resultado["objetivo"])
-    print("Caminho Retornado:", resultado["caminho"])
-    print("Custo do Caminho:", resultado["custo"])
-    print("Nós Gerados:", resultado["nos_gerados"])
-    print("Nós Visitados:", resultado["nos_visitados"])
-    print()
-
-# Testes
-executar_experimento(busca_em_largura, 1, 3, 3, 3, custo_c1)
-executar_experimento(busca_em_largura, 1, 3, 3, 3, custo_c2)
-executar_experimento(busca_em_largura, 1, 3, 3, 3, custo_c3)
-executar_experimento(busca_em_largura, 1, 3, 3, 3, custo_c4)
-
-executar_experimento(busca_em_profundidade, 1, 3, 3, 3, custo_c1)
-executar_experimento(busca_em_profundidade, 1, 3, 3, 3, custo_c2)
-executar_experimento(busca_em_profundidade, 1, 3, 3, 3, custo_c3)
-executar_experimento(busca_em_profundidade, 1, 3, 3, 3, custo_c4)
+if __name__ == "__main__":
+    resultados = executar_experimentos()
+    salvar_resultados(resultados)
