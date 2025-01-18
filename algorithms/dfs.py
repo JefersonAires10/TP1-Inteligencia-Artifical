@@ -32,8 +32,8 @@ def dfs(x1, y1, x2, y2, acao_custo):
 
             # Adiciona os vizinhos à pilha, **filtrando os já visitados**
             for vizinho in vizinhos:
-                if (vizinho.x, vizinho.y) not in visitados:
-                    stack.append(vizinho)
+              stack.append(vizinho)
+
 
     # Caso não encontre o objetivo
     return {
