@@ -1,4 +1,3 @@
-# main.py
 import random
 from collections import deque
 import math
@@ -21,5 +20,5 @@ def experimento_dfs():
     print(f"Resultado final: {resultado}")
 
 
-if __name__ == "__main__":
+if __name__ == "main":
     experimento_dfs()
