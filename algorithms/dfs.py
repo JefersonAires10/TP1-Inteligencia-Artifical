@@ -2,45 +2,43 @@ from collections import deque
 import math
 from models.Node import Node, reconstruir_caminho
 
+
 def dfs(x1, y1, x2, y2, acao_custo):
-    stack = [Node(x1, y1, 0, 0, acao_custo=acao_custo)]  # Pilha inicial com o nó raiz
-    visitados = set()  # Para armazenar estados visitados
     nos_gerados = 0
+    nos_visitados = 0
+    inicio = Node(x1, y1, 0, 0, acao_custo=acao_custo)
+    objetivo = Node(x2, y2, 0, 0, acao_custo=acao_custo)
+    fronteira = [inicio]
+    visitados = set()
 
-    while stack:
-        no_atual = stack.pop()  # Remove o nó com menor custo
-        estado_atual = (no_atual.x, no_atual.y)
+    while fronteira:
+        no = fronteira.pop()
+        nos_visitados += 1
+        visitados.add((no.x, no.y))
 
-        # Verifica se o objetivo foi alcançado
-        if estado_atual == (x2, y2):
+        if (no.x, no.y) == (objetivo.x, objetivo.y):
+            caminho = reconstruir_caminho(no)
+            custo_total = no.custo
             return {
                 "estado_inicial": (x1, y1),
-                "objetivo": (x2, y2),
-                "caminho": reconstruir_caminho(no_atual),
-                "custo": no_atual.custo,
+                "objetivo_busca": (x2, y2),
+                "caminho": caminho,
+                "custo": custo_total,
                 "nos_gerados": nos_gerados,
-                "nos_visitados": len(visitados),
+                "nos_visitados": nos_visitados
             }
 
-        # Adiciona o estado atual aos visitados se ainda não estiver lá
-        if estado_atual not in visitados:
-            visitados.add(estado_atual)
+        vizinhos = no.gerar_vizinhos(visitados)
+        nos_gerados += len(vizinhos)
 
-            # Gera os vizinhos que ainda não foram visitados
-            vizinhos = no_atual.gerar_vizinhos(visitados)
-            nos_gerados += len(vizinhos)
+        for vizinho in vizinhos:
+            fronteira.append(vizinho)
 
-            # Adiciona os vizinhos à pilha, **filtrando os já visitados**
-            for vizinho in vizinhos:
-              stack.append(vizinho)
-
-
-    # Caso não encontre o objetivo
     return {
         "estado_inicial": (x1, y1),
-        "objetivo": (x2, y2),
-        "caminho": None,
-        "custo": math.inf,
+        "objetivo_busca": (x2, y2),
+        "caminho": "Erro - Caminho Não Encontrado",
+        "custo": float('inf'),
         "nos_gerados": nos_gerados,
-        "nos_visitados": len(visitados),
+        "nos_visitados": nos_visitados,
     }
