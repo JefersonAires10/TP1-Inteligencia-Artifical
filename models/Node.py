@@ -1,3 +1,4 @@
+import random
 class Node:
     def __init__(self, x, y, custo, profundidade, pai=None, acao_custo=None):
         self.x = x
@@ -14,12 +15,18 @@ class Node:
         x, y, profundidade = self.x, self.y, self.profundidade
         vizinhos = []
         estados_vizinhos = [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]
-        acoes = ["f1", "f2", "f3", "f4"]
-
+        acoes = ["f1", "f2", "f3", "f4"] # Mapeando vizinhos com ações
+        random.shuffle(estados_vizinhos)
+    
         for i, (nx, ny) in enumerate(estados_vizinhos):
             if nx >= 0 and ny >= 0 and (nx, ny) not in visitados:
+                vizinho = Node(nx, ny, 0, profundidade + 1, self)
+                # Ajuste: Passar a acao para função de custo
                 custo_novo = self.custo + self.acao_custo(acoes[i], profundidade)
-                vizinhos.append(Node(nx, ny, custo_novo, profundidade + 1, self, self.acao_custo))
+                vizinho.custo = custo_novo
+                vizinho.acao_custo = self.acao_custo
+                vizinhos.append(vizinho)
+        print(f"Vizinhos gerados para ({self.x}, {self.y}): {[ (v.x, v.y) for v in vizinhos ]}")
         return vizinhos
     
 def reconstruir_caminho(no):
