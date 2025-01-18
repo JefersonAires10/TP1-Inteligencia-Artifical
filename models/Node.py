@@ -21,12 +21,12 @@ class Node:
         random.shuffle(estados_vizinhos)
 
         for i, (nx, ny) in enumerate(estados_vizinhos):
-            if nx >= 0 and ny >= 0 and (nx, ny) not in visitados:
-                vizinho = Node(nx, ny, 0, profundidade + 1, self)
+            if nx >= 0 and nx <= 30 and ny >= 0 and ny <= 30 and (nx, ny) not in visitados:
+                vizinho = Node(nx, ny, 0, profundidade + 1, self, self.acao_custo)
                 # Ajuste: Passar a acao para função de custo
                 custo_novo = self.custo + self.acao_custo(acoes[i], profundidade)
                 vizinho.custo = custo_novo
-                vizinho.acao_custo = self.acao_custo
+
                 vizinhos.append(vizinho)
         print(f"Vizinhos gerados para ({self.x}, {self.y}): {[(v.x, v.y) for v in vizinhos]}")
         return vizinhos

@@ -20,5 +20,6 @@ def experimento_dfs():
     print(f"Resultado final: {resultado}")
 
 
-if __name__ == "main":
+if __name__ == "__main__":
     experimento_dfs()
+    print("Experimento finalizado")
