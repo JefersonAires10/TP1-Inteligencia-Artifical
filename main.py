@@ -17,7 +17,7 @@ from actionCost.c4 import c4
 def experimento_dfs():
     x1, y1, x2, y2 = 0, 0, 9, 9
     acao_custo = c1  # Use c1, c2, c3 ou c4
-    resultado = busca_em_largura(x1, y1, x2, y2, acao_custo)
+    resultado = dfs(x1, y1, x2, y2, acao_custo)
     print(f"Resultado final: {resultado}")
 
 
