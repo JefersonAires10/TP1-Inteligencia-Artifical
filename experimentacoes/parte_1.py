@@ -10,7 +10,6 @@ from actionCost.c2 import c2
 from actionCost.c3 import c3
 from actionCost.c4 import c4
 
-# Funções de custo já definidas
 custos = {
     "f1": c1,
     "f2": c2,
@@ -20,7 +19,7 @@ custos = {
 
 # Configuração inicial
 num_experimentos = 50
-limite_coordenadas = 10  # Coordenadas aleatórias entre 0 e limite_coordenadas
+limite_coordenadas = 10
 resultados = {
     "BFS": [],
     "DFS": [],
@@ -29,9 +28,11 @@ resultados = {
 
 # Laço de experimentação
 for _ in range(num_experimentos):
+    # Gera coordenadas aleatórias para o estado inicial e objetivo
     x1, y1 = random.randint(0, limite_coordenadas), random.randint(0, limite_coordenadas)
     x2, y2 = random.randint(0, limite_coordenadas), random.randint(0, limite_coordenadas)
 
+    # Execução e armazenamento da busca em largura, busca em profundidade e busca de custo uniforme
     for nome_algoritmo, algoritmo in zip(["BFS", "DFS", "Custo_Uniforme"], [busca_em_largura, dfs, dijkstra]):
         for nome_custo, func_custo in custos.items():
             resultado = algoritmo(x1, y1, x2, y2, func_custo)

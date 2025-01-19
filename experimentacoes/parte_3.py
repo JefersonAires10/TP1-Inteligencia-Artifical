@@ -14,7 +14,6 @@ from actionCost.c4 import c4
 from heuristic.h1 import heuristica_h1
 from heuristic.h2 import heuristica_h2
 
-# Funções de custo já definidas
 custos = {
     "f1": c1,
     "f2": c2,
@@ -22,7 +21,6 @@ custos = {
     "f4": c4
 }
 
-# Funções heurísticas já definidas
 heuristicas = {
     "h1": heuristica_h1,
     "h2": heuristica_h2
@@ -30,7 +28,7 @@ heuristicas = {
 
 # Configuração inicial
 num_experimentos = 50
-limite_coordenadas = 10  # Coordenadas aleatórias entre 0 e limite_coordenadas
+limite_coordenadas = 10
 resultados = {
     "Busca_Gulosa": [],
     "A*": []
@@ -39,6 +37,7 @@ resultados = {
 # Laço de experimentação
 
 for _ in range(num_experimentos):
+    # Gera coordenadas aleatórias para o estado inicial e objetivo
     x1, y1 = random.randint(0, limite_coordenadas), random.randint(0, limite_coordenadas)
     x2, y2 = random.randint(0, limite_coordenadas), random.randint(0, limite_coordenadas)
 

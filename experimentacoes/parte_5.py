@@ -19,6 +19,7 @@ def executar_experimento_excel():
         (x1, y1), (x2, y2), *farmacias = pontos
 
         for func_custo in [c1, c2, c3, c4]:
+            # Execução e armazenamento do A* com parada
             for heuristica in [heuristica_h1, heuristica_h2]:
                 resultado = a_estrela_parada(
                     x1, y1, x2, y2, farmacias, func_custo, heuristica
