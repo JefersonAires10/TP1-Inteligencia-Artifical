@@ -3,6 +3,9 @@ import pandas as pd
 
 from algorithms.dijkstra import dijkstra
 from algorithms.aEstrela import a_estrela
+from algorithms.bfs import busca_em_largura
+from algorithms.dfs import dfs
+from algorithms.busca_gulosa import busca_gulosa
 
 from actionCost.c1 import c1
 from actionCost.c2 import c2
