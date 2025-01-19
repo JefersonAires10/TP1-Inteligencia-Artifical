@@ -36,37 +36,38 @@ for _ in range(num_experimentos):
     x1, y1 = random.randint(0, limite_coordenadas), random.randint(0, limite_coordenadas)
     x2, y2 = random.randint(0, limite_coordenadas), random.randint(0, limite_coordenadas)
 
-    # Execuções para Busca em Largura
+     # Execuções para Busca em Largura
     for i in range(num_execucoes_por_par):
-        for nome_custo, func_custo in custos.items():
-            resultado = busca_em_largura(x1, y1, x2, y2, func_custo)
-            resultados["Busca em Largura"].append({
-                "Experimento": _,
-                "Execução": i,
-                "Estado Inicial": (x1, y1),
-                "Objetivo": (x2, y2),
-                "Caminho": resultado["caminho"] if resultado["caminho"] else "Erro",
-                "Custo": resultado["custo"],
-                "Nós Gerados": resultado["nos_gerados"],
-                "Nós Visitados": resultado["nos_visitados"],
-                "Função de Custo": nome_custo,
-            })
+        nome_custo, func_custo = random.choice(list(custos.items()))  # Escolhe uma função de custo aleatoriamente
+        resultado = busca_em_largura(x1, y1, x2, y2, func_custo)
+        resultados["Busca em Largura"].append({
+            "Experimento": _,
+            "Execução": i,
+            "Estado Inicial": (x1, y1),
+            "Objetivo": (x2, y2),
+            "Caminho": resultado["caminho"] if resultado["caminho"] else "Erro",
+            "Custo": resultado["custo"],
+            "Nós Gerados": resultado["nos_gerados"],
+            "Nós Visitados": resultado["nos_visitados"],
+            "Função de Custo": nome_custo,
+        })
 
     # Execuções para Busca em Profundidade
     for i in range(num_execucoes_por_par):
-        for nome_custo, func_custo in custos.items():
-            resultado = dfs(x1, y1, x2, y2, func_custo)
-            resultados["Busca em Profundidade"].append({
-                "Experimento": _,
-                "Execução": i,
-                "Estado Inicial": (x1, y1),
-                "Objetivo": (x2, y2),
-                 "Caminho": resultado["caminho"] if resultado["caminho"] else "Erro",
-                "Custo": resultado["custo"],
-                "Nós Gerados": resultado["nos_gerados"],
-                "Nós Visitados": resultado["nos_visitados"],
-                "Função de Custo": nome_custo,
-            })
+        nome_custo, func_custo = random.choice(list(custos.items()))  # Escolhe uma função de custo aleatoriamente
+        resultado = dfs(x1, y1, x2, y2, func_custo)
+        resultados["Busca em Profundidade"].append({
+            "Experimento": _,
+            "Execução": i,
+            "Estado Inicial": (x1, y1),
+            "Objetivo": (x2, y2),
+            "Caminho": resultado["caminho"] if resultado["caminho"] else "Erro",
+            "Custo": resultado["custo"],
+            "Nós Gerados": resultado["nos_gerados"],
+            "Nós Visitados": resultado["nos_visitados"],
+            "Função de Custo": nome_custo,
+        })
+
 
 
 # Salvando em Excel

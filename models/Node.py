@@ -17,7 +17,9 @@ class Node:
         x, y, profundidade = self.x, self.y, self.profundidade
         vizinhos = []
         estados_vizinhos = [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]
-        acoes = ["f1", "f2", "f3", "f4"]  # Mapeando vizinhos com ações
+        acoes = ["f1", "f2", "f3", "f4"] 
+        # Ajuste: Embaralhar a ordem dos vizinhos
+        # Randomização
         random.shuffle(estados_vizinhos)
 
         for i, (nx, ny) in enumerate(estados_vizinhos):
