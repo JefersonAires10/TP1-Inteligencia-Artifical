@@ -19,11 +19,12 @@ Este projeto implementa e executa experimentos com diferentes algoritmos de busc
 ## Requisitos
 
 - Python 3.x
-- Pandas
-- Openpyxl
 
 ## Instalação das dependências
-pip install pandas openpyxl
+As dependências do projeto (todas listadas no arquivo requirements.txt) podem ser instaladas separadamente com o comando `pip install <nome_da_dependencia>`. 
+
+Muito provavelmente você terá a maioria das dependências instaladas, posto que algumas são nativas do Python. No entanto, se encontrar problemas de versão, pode instalar (ou ajustar) as dependências com o comando `pip install -r requirements.txt`.
+Dessa forma, todas as dependências serão instaladas ou atualizadas de acordo com o arquivo requirements.txt.
 
 ## Testes
 
