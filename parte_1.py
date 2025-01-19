@@ -49,7 +49,7 @@ for _ in range(num_experimentos):
             })
 
 # Salvando em Excel
-with pd.ExcelWriter("resultados_experimentacao_parte_1.xlsx") as writer:
+with pd.ExcelWriter("experimentacoes/resultados_experimentacao_parte_1.xlsx") as writer:
     for nome_algoritmo, registros in resultados.items():
         df = pd.DataFrame(registros)
         df.to_excel(writer, sheet_name=nome_algoritmo, index=False)
