@@ -4,6 +4,7 @@ from models.Node import Node, reconstruir_caminho
 
 
 def dfs(x1, y1, x2, y2, acao_custo):
+    # Inicializa a pilha com o nó raiz
     nos_gerados = 0
     nos_visitados = 0
     inicio = Node(x1, y1, 0, 0, acao_custo=acao_custo)
@@ -16,6 +17,7 @@ def dfs(x1, y1, x2, y2, acao_custo):
         nos_visitados += 1
         visitados.add((no.x, no.y))
 
+        # Verifica se o objetivo foi alcançado e retorna o caminho
         if (no.x, no.y) == (objetivo.x, objetivo.y):
             caminho = reconstruir_caminho(no)
             custo_total = no.custo
@@ -31,9 +33,11 @@ def dfs(x1, y1, x2, y2, acao_custo):
         vizinhos = no.gerar_vizinhos(visitados)
         nos_gerados += len(vizinhos)
 
+        # Adiciona os vizinhos à fronteira
         for vizinho in vizinhos:
             fronteira.append(vizinho)
 
+    # Caso não encontre o objetivo
     return {
         "estado_inicial": (x1, y1),
         "objetivo_busca": (x2, y2),

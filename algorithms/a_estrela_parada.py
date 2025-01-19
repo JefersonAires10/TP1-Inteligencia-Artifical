@@ -37,10 +37,12 @@ def a_estrela_parada(x1, y1, x2, y2, farmacias, acao_custo, heuristica):
                 "nos_visitados": len(visitados),
             }
 
+        # Adiciona o estado atual aos visitados se ainda não estiver lá
         if estado_atual not in visitados:
             visitados.add(estado_atual)
             vizinhos = no_atual.gerar_vizinhos(visitados)
 
+            # Adiciona os vizinhos ao heap, **filtrando os já visitados** e atualizando o custo com a heuristica
             for vizinho in vizinhos:
                 if (vizinho.x, vizinho.y) not in visitados:
                     # Adiciona o custo heurístico
